@@ -19,6 +19,8 @@ function App() {
 				const dialog = document.createElement("dialog");
 				const textarea = document.createElement("textarea");
 				textarea.placeholder = "Hit shift+enter when done";
+				textarea.cols = 30;
+				textarea.rows = 20;
 				textarea.addEventListener("keyup", async (event) => {
 					if (
 						event.shiftKey &&
