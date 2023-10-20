@@ -2,9 +2,11 @@ import "./App.css";
 import { ReactTerminal } from "react-terminal";
 
 function App() {
+	let paste_response = "";
 	const commands = {
 		echo: (...args) => args.join(" "),
 		ls: () => fetch("https://p.seanbehan.ca/list").then((res) => res.text()),
+		geturl: async () => paste_response,
 		paste: async (...args) => {
 			let body = "";
 			if (args[0] !== "") {
@@ -24,7 +26,7 @@ function App() {
 					) {
 						dialog.remove();
 						body = textarea.value;
-						await fetch("https://p.seanbehan.ca", {
+						paste_response = await fetch("https://p.seanbehan.ca", {
 							method: "POST",
 							body,
 						}).then((res) => res.text());
