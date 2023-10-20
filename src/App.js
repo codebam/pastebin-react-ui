@@ -4,7 +4,16 @@ import { ReactTerminal } from "react-terminal";
 function App() {
 	let paste_response = "";
 	const commands = {
-		help: () => ["echo", "ls", "geturl", "paste", "clear"].join("\n"),
+		help: () => (
+			<>
+				{["echo", "ls", "geturl", "paste", "clear", "help"].map((item) => (
+					<>
+						{item}
+						<br />
+					</>
+				))}
+			</>
+		),
 		echo: (...args) => args.join(" "),
 		ls: () => fetch("https://p.seanbehan.ca/list").then((res) => res.text()),
 		geturl: async () => paste_response,
