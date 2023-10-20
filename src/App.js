@@ -4,13 +4,10 @@ import { ReactTerminal } from "react-terminal";
 function App() {
 	let paste_response = "";
 	const commands = {
-		help: () => (
-			<>
-				{["echo", "ls", "geturl", "paste", "clear", "help"].map((item) => (
-					<div>{item}</div>
-				))}
-			</>
-		),
+		help: () =>
+			["echo", "ls", "geturl", "paste", "clear", "help"].map((item) => (
+				<div>{item}</div>
+			)),
 		echo: (...args) => args.join(" "),
 		ls: async () =>
 			(await fetch("https://p.seanbehan.ca/list").then((res) => res.text()))
