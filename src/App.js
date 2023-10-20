@@ -7,15 +7,15 @@ function App() {
 		help: () => (
 			<>
 				{["echo", "ls", "geturl", "paste", "clear", "help"].map((item) => (
-					<>
-						{item}
-						<br />
-					</>
+					<div>{item}</div>
 				))}
 			</>
 		),
 		echo: (...args) => args.join(" "),
-		ls: () => fetch("https://p.seanbehan.ca/list").then((res) => res.text()),
+		ls: async () =>
+			(await fetch("https://p.seanbehan.ca/list").then((res) => res.text()))
+				.split("\n")
+				.map((line) => <div>{line}</div>),
 		geturl: async () => paste_response,
 		paste: async (...args) => {
 			let body = "";
