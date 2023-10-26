@@ -44,9 +44,14 @@ function App() {
 						);
 						break;
 					case "rm":
-						data = await fetch(`https://p.seanbehan.ca/${args[1]}`, {
-							method: "DELETE",
-						}).then((res) => res.text());
+						data = await Promise.all(
+							args.slice(1).map((arg) =>
+								fetch(`https://p.seanbehan.ca/${arg}`, {
+									method: "DELETE",
+								}).then((res) => res.text())
+							)
+						);
+						console.log(data);
 						appendTerminalLineData(data);
 						break;
 					case "clear":
