@@ -1,60 +1,64 @@
 import "./App.css";
-import { ReactTerminal } from "react-terminal";
+import React, { useState } from "react";
+import Terminal, { ColorMode, TerminalOutput } from "react-terminal-ui";
 
 function App() {
-	let paste_response = "";
-	const commands = {
-		help: () =>
-			["echo", "ls", "geturl", "paste", "clear", "help"].map((item) => (
-				<div>{item}</div>
-			)),
-		echo: (...args) => args.join(" "),
-		ls: async () =>
-			(await fetch("https://p.seanbehan.ca/list").then((res) => res.text()))
-				.split("\n")
-				.map((line) => <div>{line}</div>),
-		geturl: async () => paste_response,
-		paste: async (...args) => {
-			let body = "";
-			if (args[0] !== "") {
-				body = args.join(" ");
-				return await fetch("https://p.seanbehan.ca", {
-					method: "POST",
-					body,
-				}).then((res) => res.text());
-			} else {
-				const dialog = document.createElement("dialog");
-				const textarea = document.createElement("textarea");
-				textarea.placeholder = "Hit shift+enter when done";
-				textarea.cols = 30;
-				textarea.rows = 20;
-				textarea.addEventListener("keyup", async (event) => {
-					if (
-						event.shiftKey &&
-						(event.keyCode === 13 || event.key === "Enter")
-					) {
-						dialog.remove();
-						body = textarea.value;
-						paste_response = await fetch("https://p.seanbehan.ca", {
-							method: "POST",
-							body,
-						}).then((res) => res.text());
-					}
-				});
-				dialog.appendChild(textarea);
-				document.body.appendChild(dialog);
-				dialog.show();
-			}
-		},
+	const [terminalLineData, setTerminalLineData] = useState([
+		<TerminalOutput>Welcome to Sean's Pastebin Terminal</TerminalOutput>,
+	]);
+
+	const appendTerminalLineData = (str) => {
+		setTerminalLineData(
+			<>
+				{terminalLineData}
+				<TerminalOutput>{str}</TerminalOutput>
+			</>
+		);
 	};
+
 	return (
-		<ReactTerminal
-			prompt={"$"}
-			showControlButtons={false}
-			showControlBar={false}
-			commands={commands}
-			theme={"dracula"}
-		/>
+		<Terminal
+			name="React Pastebin Terminal"
+			height="100vh"
+			colorMode={ColorMode.Dark}
+			onInput={async (terminalInput) => {
+				console.log(`New terminal input received: '${terminalInput}'`);
+				const args = terminalInput.split(" ");
+				let data;
+				switch (args[0]) {
+					case "ls":
+						data = await fetch("https://p.seanbehan.ca/list").then((res) =>
+							res.text()
+						);
+						appendTerminalLineData(data);
+						break;
+					case "cat":
+						data = await fetch(`https://p.seanbehan.ca/${args[1]}`).then(
+							(res) => res.text()
+						);
+						appendTerminalLineData(data);
+						break;
+					case "help":
+						appendTerminalLineData(
+							"available commands: ls, cat, help, rm, clear"
+						);
+						break;
+					case "rm":
+						data = await fetch(`https://p.seanbehan.ca/${args[1]}`, {
+							method: "DELETE",
+						}).then((res) => res.text());
+						appendTerminalLineData(data);
+						break;
+					case "clear":
+						setTerminalLineData(<TerminalOutput></TerminalOutput>);
+						break;
+					default:
+						appendTerminalLineData("command not found.");
+				}
+			}}
+		>
+			{terminalLineData}
+		</Terminal>
 	);
 }
 
